@@ -1,24 +1,23 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Agents.AI;
+using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
-Console.WriteLine("Hello, Work!");
+using System.Text.Json;
+using YanyanAgents;
 
-// Azure OpenAI接続
-var azureClient = new AzureOpenAIClient(
-    new Uri("https://<your-resource>.openai.azure.com"),
-    new DefaultAzureCredential()
-);
-
-var chatClient = azureClient.GetChatClient("<your-deployment-name>");
+// 設定を読み込んでクライアントを作成
+var azureConfig = AzureOpenAIConfig.FromDefaultFiles();
+var client = azureConfig.CreateClient();
+var chatClient = client.GetChatClient(azureConfig.Deployment);
 
 // エージェント作成
 var agent = chatClient.AsAIAgent(
-    instructions: "あなたは親切なアシスタントです。",
+    instructions: File.ReadAllText("Plugins/MyPrompt.dat"),
     name: "YanyanAgent"
 );
 
 // テスト実行
 Console.WriteLine("YanyanAgent 起動！");
-var response = await agent.RunAsync("こんにちは！自己紹介して。");
+var response = await agent.RunAsync("こんにちは！");
 Console.WriteLine($"Agent: {response}");

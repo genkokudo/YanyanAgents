@@ -1,3 +1,4 @@
 <Solution>
+  <Project Path="YanyanAgents.Core/YanyanAgents.Core.csproj" Id="ff007b22-fd89-40a3-a90b-13c2abf3e304" />
   <Project Path="YanyanAgents/YanyanAgents.csproj" />
 </Solution>
