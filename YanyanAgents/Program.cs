@@ -3,7 +3,6 @@ using Azure.Identity;
 using Microsoft.Agents.AI;
 using Microsoft.Extensions.Configuration;
 using OpenAI.Chat;
-using System.Text.Json;
 using YanyanAgents;
 
 // 設定を読み込んでクライアントを作成
