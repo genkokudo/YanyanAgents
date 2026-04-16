@@ -1,8 +1,10 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.Identity;
 using Microsoft.Agents.AI;
-using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.AI;
+using ModelContextProtocol.Client;
 using OpenAI.Chat;
+using System.Net;
 using YanyanAgents;
 
 // 設定を読み込んでクライアントを作成
@@ -35,13 +37,6 @@ while (true)
     Console.WriteLine($"Agent: {response}");
 }
 
-//// 保存
-//var serialized = agent.SerializeSession(session);
-//File.WriteAllText("session.json", serialized);
 
-//// 復元
-//var saved = File.ReadAllText("session.json");
-//AgentSession resumedSession = await agent.DeserializeSessionAsync(saved);
 
-//// 続きから再開
-//string response = await agent.RunAsync("さっきの話の続きやけど...", resumedSession);
+
