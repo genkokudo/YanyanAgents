@@ -8,7 +8,7 @@ public static class WeatherTools
     public static string GetWeather(
         [Description("都市名")] string city)
     {
-        return $"{city}の天気は晴れです";  // ← 中身はそのままでOK
+        return $"{city}の天気は晴れです";
     }
 }
 

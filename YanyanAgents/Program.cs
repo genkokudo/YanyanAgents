@@ -11,13 +11,38 @@ var azureConfig = AzureOpenAIConfig.FromDefaultFiles();
 var client = azureConfig.CreateClient();
 var chatClient = client.GetChatClient(azureConfig.Deployment);
 
-// エージェント作成
+
+// エージェント作成（今まで通り）
 var agent = chatClient.AsAIAgent(
-    instructions: File.ReadAllText("Plugins/MyPrompt.dat"),
+//    instructions: File.ReadAllText("Plugins/MyPrompt.dat"),
+    instructions: "あなたは親切なアシスタントです。",
     name: "YanyanAgent"
 );
 
-// テスト実行
-Console.WriteLine("YanyanAgent 起動！");
-var response = await agent.RunAsync("こんにちは！");
-Console.WriteLine($"Agent: {response}");
+// セッション作成（←これがチャット履歴の本体）
+AgentSession session = await agent.CreateSessionAsync();
+
+// チャットループ
+Console.WriteLine("YanyanAgent 起動！（exitで終了）");
+while (true)
+{
+    Console.Write("You: ");
+    string? input = Console.ReadLine();
+
+    if (string.IsNullOrWhiteSpace(input)) continue;
+    if (input.Equals("exit", StringComparison.OrdinalIgnoreCase)) break;
+
+    var response = await agent.RunAsync(input, session);
+    Console.WriteLine($"Agent: {response}");
+}
+
+//// 保存
+//var serialized = agent.SerializeSession(session);
+//File.WriteAllText("session.json", serialized);
+
+//// 復元
+//var saved = File.ReadAllText("session.json");
+//AgentSession resumedSession = await agent.DeserializeSessionAsync(saved);
+
+//// 続きから再開
+//string response = await agent.RunAsync("さっきの話の続きやけど...", resumedSession);
