@@ -5,7 +5,9 @@ using Microsoft.Extensions.AI;
 using ModelContextProtocol.Client;
 using OpenAI.Chat;
 using System.Net;
+using System.Security.Cryptography;
 using YanyanAgents;
+using YanyanAgents.ChatPattern;
 
 // 設定を読み込んでクライアントを作成
 var azureConfig = AzureOpenAIConfig.FromDefaultFiles();
@@ -13,30 +15,29 @@ var client = azureConfig.CreateClient();
 var chatClient = client.GetChatClient(azureConfig.Deployment);
 
 
-// エージェント作成（今まで通り）
-var agent = chatClient.AsAIAgent(
-//    instructions: File.ReadAllText("Plugins/MyPrompt.dat"),
-    instructions: "あなたは親切なアシスタントです。",
-    name: "YanyanAgent"
-);
 
-// セッション作成（←これがチャット履歴の本体）
-AgentSession session = await agent.CreateSessionAsync();
 
-// チャットループ
-Console.WriteLine("YanyanAgent 起動！（exitで終了）");
+// ★ここを差し替えるだけで別パターンに切り替えられる
+//SequentialChat chat = new(chatClient);
+//HandoffChat chat = new(chatClient);
+GroupChat chat = new(chatClient);
+// あと、MagenticChatもありますが、C#は未対応なので今回は割愛する。これは、「何をどう進めるかも含めて自分で考える」複雑タスクなので他のパターンとは毛色が異なる。
+
+
+Console.WriteLine($"=== {chat.PatternName} のデモ ===");
+Console.WriteLine("終了するには 'exit' と入力してください\n");
+
 while (true)
 {
-    Console.Write("You: ");
-    string? input = Console.ReadLine();
+    Console.Write("あなた: ");
+    var input = Console.ReadLine();
+    if (string.IsNullOrWhiteSpace(input) || input == "exit") break;
 
-    if (string.IsNullOrWhiteSpace(input)) continue;
-    if (input.Equals("exit", StringComparison.OrdinalIgnoreCase)) break;
-
-    var response = await agent.RunAsync(input, session);
-    Console.WriteLine($"Agent: {response}");
+    Console.Write("AI: ");
+    await foreach (var chunk in chat.RunTurnAsync(input))
+    {
+        Console.Write(chunk);
+    }
+    Console.WriteLine();
 }
-
-
-
 
